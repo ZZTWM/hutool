@@ -3,6 +3,7 @@ package cn.how2j.test;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
  
+import java.io.IOException;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -16,21 +17,37 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.qrcode.QrCodeUtil;
+import cn.hutool.extra.ftp.Ftp;
  
-public class TestQR {
+public class TestFTP {
  
     @Test
-    @Comment("生成二维码图片和解析图片")
+    @Comment("上传下载")
     public void test1(){
-        String string = "食屎啊！";
-        String path = "d:/qrcode.jpg";
-        QrCodeUtil.generate(string, 300, 300, FileUtil.file(path));
- 
-        p1("字符串",string,"二维码图片",path);
          
-        string =  QrCodeUtil.decode(FileUtil.file(path));
-        p1("二维码图片",path,"二维码图片",string);
+        String localFile4Upload = "d:/test.jpg";
+        String localFile4Download = "d:/test2.jpg";
+        String remoteFolder = "/";
+        String remoteFile = "test.jpg";
+        String ftpServer = "28.212.18.5"; //这是无效的ip地址，请使用自己有效的ftp服务器ip地址
+        String name = "ftpuser";
+        String password = "password123";
+         
+        Ftp ftp = new Ftp(ftpServer,21,name,password);
+        boolean success= ftp.upload(remoteFolder,remoteFile, FileUtil.file(localFile4Upload));
+        p3("上传是否成功",success);
+         
+        ftp.download(remoteFolder, remoteFile, FileUtil.file(localFile4Download));
+         
+        p3("用于上传的文件大小", FileUtil.file(localFile4Upload).length());
+        p3("下载下来之后的文件大小", FileUtil.file(localFile4Download).length());
+ 
+        try {
+            ftp.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
          
     }
      
